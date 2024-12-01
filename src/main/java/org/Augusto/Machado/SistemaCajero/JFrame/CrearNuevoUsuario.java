@@ -1,8 +1,8 @@
 package org.Augusto.Machado.SistemaCajero.JFrame;
 
 import org.Augusto.Machado.SistemaCajero.Models.Usuario;
-import org.Augusto.Machado.SistemaCajero.Repositorio.UsuarioRepositorio;
-import org.Augusto.Machado.SistemaCajero.Repositorio.UsuarioRepositorioImpl;
+import org.Augusto.Machado.SistemaCajero.Repositorio.Usuario.UsuarioRepositorio;
+import org.Augusto.Machado.SistemaCajero.Repositorio.Usuario.UsuarioRepositorioImpl;
 
 import javax.swing.*;
 import java.awt.*;

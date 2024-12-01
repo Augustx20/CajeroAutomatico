@@ -1,4 +1,4 @@
-package org.Augusto.Machado.SistemaCajero.Repositorio;
+package org.Augusto.Machado.SistemaCajero.Repositorio.Usuario;
 
 import org.Augusto.Machado.SistemaCajero.Models.Usuario;
 import org.Augusto.Machado.SistemaCajero.Util.ConexionBaseDatos;
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
+
+    private boolean BOOLEAN_RESULTADO = false;
 
     private Connection getConnection() throws SQLException {
         return ConexionBaseDatos.getInstance();
@@ -74,34 +76,49 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
 
     @Override
     public boolean porUsuario(String usuario,char[] pin ) {
-        boolean resultado = false;
         try(PreparedStatement stmt = getConnection().
                 prepareStatement("select * from usuario where usuario = ? And PIN = ?")) {
             stmt.setString(1, usuario);
             stmt.setString(2, new String(pin));
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                resultado = true;
+                BOOLEAN_RESULTADO = true;
             }
         }catch (SQLException e) {
-            resultado = false;
+            BOOLEAN_RESULTADO = false;
             e.printStackTrace();
         }
-        return resultado;
+        return BOOLEAN_RESULTADO;
     }
 
     @Override
     public boolean ValidarUsuario(String usuario) {
-        boolean resultado = false;
         try(PreparedStatement stmt = getConnection().
                 prepareStatement("select * from usuario where usuario = ?")) {
             stmt.setString(1, usuario);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                resultado = true;
+                BOOLEAN_RESULTADO = true;
             }
         }catch (SQLException e) {
-            resultado = false;
+            BOOLEAN_RESULTADO = false;
+            e.printStackTrace();
+        }
+        return BOOLEAN_RESULTADO;
+    }
+
+    @Override
+    public int MostrarSaldoUsuario(String usuario) {
+        int resultado = 0;
+        try(PreparedStatement stmt = getConnection().
+                prepareStatement("select * from saldo where id_usuario = " +
+                        "(select id from usuario where usuario = ?)")) {
+            stmt.setString(1, usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                BOOLEAN_RESULTADO = true;
+            }
+        }catch (SQLException e) {
             e.printStackTrace();
         }
         return resultado;

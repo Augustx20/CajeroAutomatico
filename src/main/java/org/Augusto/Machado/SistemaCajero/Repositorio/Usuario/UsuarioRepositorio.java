@@ -1,4 +1,4 @@
-package org.Augusto.Machado.SistemaCajero.Repositorio;
+package org.Augusto.Machado.SistemaCajero.Repositorio.Usuario;
 
 import java.util.List;
 
@@ -14,4 +14,6 @@ public interface UsuarioRepositorio<T> {
     boolean porUsuario(String usuario, char[] PIN);
 
     boolean ValidarUsuario(String usuario);
+
+    int MostrarSaldoUsuario(String usuario);
 }

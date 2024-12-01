@@ -1,8 +1,9 @@
 package org.Augusto.Machado.SistemaCajero.JFrame;
 
+import org.Augusto.Machado.SistemaCajero.JFrame.Menu.MenuUsuario;
 import org.Augusto.Machado.SistemaCajero.Models.Usuario;
-import org.Augusto.Machado.SistemaCajero.Repositorio.UsuarioRepositorio;
-import org.Augusto.Machado.SistemaCajero.Repositorio.UsuarioRepositorioImpl;
+import org.Augusto.Machado.SistemaCajero.Repositorio.Usuario.UsuarioRepositorio;
+import org.Augusto.Machado.SistemaCajero.Repositorio.Usuario.UsuarioRepositorioImpl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,6 +72,7 @@ public class Inicio extends JFrame {
                 if (usuarioRepositorio.porUsuario(usuario,pin)) {
                     // Acciones a realizar en caso de éxito
                     JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
+                    new MenuUsuario(usuario);
                 } else {
                     // Acciones a realizar en caso de error
                     JOptionPane.showMessageDialog(null, "Usuario o PIN incorrecto / Tener en cuenta que si " +
