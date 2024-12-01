@@ -5,7 +5,7 @@ import java.util.List;
 public interface UsuarioRepositorio<T> {
     List<T> listar();
 
-    T porId(int id);
+    int porId(String usuario);
 
     boolean crearUsuario(T t);
 
@@ -16,4 +16,8 @@ public interface UsuarioRepositorio<T> {
     boolean ValidarUsuario(String usuario);
 
     int MostrarSaldoUsuario(String usuario);
+
+    int Depositar(String usuario, int saldo);
+
+    int Retirar (String usuario, int saldo);
 }

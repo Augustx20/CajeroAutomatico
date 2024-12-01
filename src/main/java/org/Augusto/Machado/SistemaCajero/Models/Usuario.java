@@ -7,7 +7,6 @@ public class Usuario {
     private String usuario;
     private Integer PIN;
     private int saldo;
-    private Long id_usuario;
 
     private Date fecha_registro;
     private int estado;
@@ -15,13 +14,12 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(Long id, String usuario, Integer PIN, Date fecha_registro,int estado, Long id_usuario,int saldo) {
+    public Usuario(Long id, String usuario, Integer PIN, Date fecha_registro,int estado,int saldo) {
         this.id = id;
         this.usuario = usuario;
         this.PIN = PIN;
         this.fecha_registro = fecha_registro;
         this.estado = estado;
-        this.id_usuario = id_usuario;
         this.saldo = 0;
 
     }
@@ -52,8 +50,4 @@ public class Usuario {
     public int getSaldo() {return saldo;}
     public void setSaldo(int saldo) {this.saldo = saldo;}
 
-
-    //GET Y SET ID_USUARIO
-    public Long getId_usuario() {return id_usuario;}
-    public void setId_usuario(Long id_usuario) {this.id_usuario = id_usuario;}
 }
