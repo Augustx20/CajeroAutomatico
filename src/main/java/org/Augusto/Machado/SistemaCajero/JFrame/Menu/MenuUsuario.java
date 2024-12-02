@@ -46,7 +46,7 @@ public class MenuUsuario extends JFrame {
         btnSalir.setPreferredSize(new Dimension(100, 50));
         btnSaldo.addActionListener(e -> {
             UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
-            int resultado = usuarioRepositorio.MostrarSaldoUsuario(u);
+            Double resultado = usuarioRepositorio.MostrarSaldoUsuario(u);
             System.out.println(u);
             JOptionPane.showMessageDialog(null, "Tu saldo es de: $ " + resultado, "Saldo Disponible", JOptionPane.PLAIN_MESSAGE);
         });
@@ -66,19 +66,56 @@ public class MenuUsuario extends JFrame {
             UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
             String textsaldoNuevo = "";
             textsaldoNuevo = JOptionPane.showInputDialog("Por favor, ingrese el saldo a depositar: ");
-
-            int saldo = Integer.parseInt(textsaldoNuevo);
-
-
-            int resultado =  usuarioRepositorio.Depositar(u, saldo);
+            Double saldo = (double) Integer.parseInt(textsaldoNuevo);
+            Double resultado =  usuarioRepositorio.Depositar(u, saldo);
             JOptionPane.showMessageDialog(null, "Tu saldo fue actualizado a: $ " + resultado, "Saldo Disponible", JOptionPane.PLAIN_MESSAGE);
         });
 
         panelCenter.add(btnRetirar);
+        btnRetirar.addActionListener(e ->{
+            UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
+            String textsaldoNuevo = "";
+            textsaldoNuevo = JOptionPane.showInputDialog("Por favor, ingrese el saldo que desea retirar: ");
+            double saldo = (double) Integer.parseInt(textsaldoNuevo);
+            Double resultado =  usuarioRepositorio.Retirar(u, saldo);
+            if (resultado == -1){
+                JOptionPane.showMessageDialog(null, "No tienes saldo suficiente para retirar!!", "Error", JOptionPane.ERROR_MESSAGE);
+            }else if(resultado == -2){
+                JOptionPane.showMessageDialog(null, "No tiene saldo en sistema!", "Error", JOptionPane.ERROR_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(null, "Tu ha retirado: $ " + saldo + "\n su saldo actual es de: "+ resultado, "Saldo Disponible", JOptionPane.PLAIN_MESSAGE);
+
+            }
+        });
         panelCenter.add(btnTransferencia);
+        btnTransferencia.addActionListener(e -> {new Transferencia(u);});
         panelCenter.add(new JLabel());
         panelCenter.add(btnPIN);
+        btnPIN.addActionListener(e ->{
+            String textPINNuevo = "";
+            boolean isValidPIN = false;
+
+            while (!isValidPIN) {
+                textPINNuevo = JOptionPane.showInputDialog("Por favor, ingrese su nueva clave PIN: ");
+                if (textPINNuevo != null && textPINNuevo.length() > 4 && textPINNuevo.matches("\\d+")) {
+                    UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
+                    char[] PIN = textPINNuevo.toCharArray();
+                    int resultado =  usuarioRepositorio.ResetearPIN(u, Integer.parseInt(textPINNuevo));
+                    if (resultado == -1){
+                        JOptionPane.showMessageDialog(null, "El PIN no debe ser igual a la anterior clave PIN. Ingrese nuevamente su clave PIN",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }else if(resultado == 1){
+                        JOptionPane.showMessageDialog(null, "PIN aceptado.");
+                        isValidPIN = true;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "El PIN debe ser mayor a 4 caracteres numéricos. Intente nuevamente.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         panelCenter.add(btnSalir);
+        btnSalir.addActionListener(event -> this.dispose());
 
         // Agregar los paneles al contenedor principal
         c.add(panelTop, BorderLayout.NORTH);

@@ -15,9 +15,16 @@ public interface UsuarioRepositorio<T> {
 
     boolean ValidarUsuario(String usuario);
 
-    int MostrarSaldoUsuario(String usuario);
+    int ValidarPIN(String usuario);
 
-    int Depositar(String usuario, int saldo);
+    Double MostrarSaldoUsuario(String usuario);
 
-    int Retirar (String usuario, int saldo);
+    Double Depositar(String usuario, Double saldo);
+
+    Double Retirar (String usuario, Double saldo);
+
+    int ResetearPIN (String usuario, int PIN);
+
+    void AgregarMovimiento(String usuario,String descripcion, Double debito,Double credito,Double saldo);
+
 }

@@ -5,6 +5,7 @@ import org.Augusto.Machado.SistemaCajero.Util.ConexionBaseDatos;
 
 import java.sql.*;
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
@@ -109,14 +110,30 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
     }
 
     @Override
-    public int MostrarSaldoUsuario(String usuario) {
-        int resultado = 0;
+    public int ValidarPIN(String usuario) {
+        int result = 0;
+        try(PreparedStatement stmt = getConnection()
+                .prepareStatement("select PIN from usuario where usuario = ?")){
+            stmt.setString(1, usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                result = rs.getInt("PIN");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result ;
+    }
+
+    @Override
+    public Double MostrarSaldoUsuario(String usuario) {
+        Double resultado = (double) 0;
         try(PreparedStatement stmt = getConnection().
                 prepareStatement("select * from saldo where id_usuario = ("+CONSULTA_SQL_ID_USUARIO +")")) {
             stmt.setString(1, usuario);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                resultado = rs.getInt("saldo");
+                resultado = rs.getDouble("saldo");
             }
         }catch (SQLException e) {
             e.printStackTrace();
@@ -125,28 +142,30 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
     }
 
     @Override
-    public int Depositar(String usuario, int saldo) {
-        int resultado = 0;
+    public Double Depositar(String usuario, Double saldo) {
+        Double resultado = (double) 0;
         try(PreparedStatement stmt = getConnection()
                 .prepareStatement("select * from saldo where id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
             stmt.setString(1,usuario);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                resultado = rs.getInt("saldo");
+                resultado = (double) rs.getInt("saldo");
 
                 resultado += saldo;
                 try(PreparedStatement stmt2 = getConnection().
                         prepareStatement("UPDATE saldo SET saldo = ? WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")) {
-                    stmt2.setInt(1,resultado);
+                    stmt2.setDouble(1,resultado);
                     stmt2.setString(2,usuario);
                     stmt2.executeUpdate();
+                    AgregarMovimiento(usuario,"DEPOSITO EN CAJERO AUTOMATICO",0.0,saldo,resultado);
                 }
                 }else{
                 try(PreparedStatement stmt3 = getConnection()
                         .prepareStatement("INSERT INTO saldo (saldo,id_usuario) VALUES (?,?)")) {
-                    stmt3.setInt(1,saldo);
+                    stmt3.setDouble(1,saldo);
                     stmt3.setInt(2,porId(usuario));
                     stmt3.executeUpdate();
+                    AgregarMovimiento(usuario,"DEPOSITO EN CAJERO AUTOMATICO",0.0,saldo,resultado);
                 }
             }
         } catch (SQLException e) {
@@ -156,12 +175,88 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
     }
 
     @Override
-    public int Retirar(String usuario, int saldo) {
-        int resultado_retirar = 0;
-        try (PreparedStatement stmt){
+    public Double Retirar(String usuario, Double saldo) {
+        double resultado_retirar = (double) 0;
+        try (PreparedStatement stmt = getConnection()
+                .prepareStatement("select * from saldo where id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
+            stmt.setString(1,usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                resultado_retirar = (double) rs.getInt("saldo");}
+            if (resultado_retirar == 0) {
+            resultado_retirar = (double) -2;
+            return resultado_retirar;
+            } else if (resultado_retirar <= 0) {
+                resultado_retirar = (double) -1;
+                return resultado_retirar ;
+            }else{
+                resultado_retirar -= saldo;
+                try(PreparedStatement stmt2 = getConnection().
+                        prepareStatement("UPDATE saldo SET saldo = ? WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")) {
+                    stmt2.setDouble(1,resultado_retirar);
+                    stmt2.setString(2,usuario);
+                    stmt2.executeUpdate();
+                    //Agregamos a nuestros moviemientos a la base de bancaria de moviemientos
 
+                    AgregarMovimiento(usuario,"DEB PREA DEBIN",saldo,0.0,resultado_retirar);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return 0;
+        return resultado_retirar;
+    }
+
+    @Override
+    public int ResetearPIN(String usuario, int PIN) {
+        int nuevoPIN = 0;
+        int viejoPIN;
+        try(PreparedStatement stmt = getConnection().
+                prepareStatement("select * from usuario where usuario = ?")) {
+            stmt.setString(1, usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                viejoPIN = rs.getInt("PIN");
+                nuevoPIN = PIN;
+                if (viejoPIN == nuevoPIN){
+                        nuevoPIN = -1;
+                }else{
+                    try(PreparedStatement stmt2 = getConnection().
+                            prepareStatement("UPDATE usuario SET PIN = ? WHERE usuario = ?")) {
+                        stmt2.setInt(1,nuevoPIN);
+                        stmt2.setString(2,usuario);
+                        stmt2.executeUpdate();
+                        nuevoPIN = 1;
+
+                    }
+                }
+            }
+        }catch (SQLException e) {e.printStackTrace();}
+        return nuevoPIN;
+    }
+
+    @Override
+    public void AgregarMovimiento(String usuario,String descripcion, Double debito,Double credito,Double saldo) {
+        int u = 0;
+        try(PreparedStatement stmt = getConnection()
+                .prepareStatement(CONSULTA_SQL_ID_USUARIO)){
+            stmt.setString(1,usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                 u = rs.getInt("id");
+            }
+            try(PreparedStatement mov = getConnection()
+                    .prepareStatement("INSERT INTO movimientos(fecha,descripcion,debito,credito,saldo,id_usuario) VALUES(?,?,?,?,?,?)")){
+                mov.setDate(1,new Date(System.currentTimeMillis()));
+                mov.setString(2,descripcion);
+                mov.setDouble(3,debito);
+                mov.setDouble(4,credito);
+                mov.setDouble(5,saldo);
+                mov.setInt(6,u);
+                mov.executeUpdate();
+            }
+        } catch (SQLException e) {throw new RuntimeException(e);}
     }
 
 
@@ -173,5 +268,8 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
         u.setFecha_registro(rs.getDate("fecha_registro"));
         u.setEstado(rs.getInt("estado"));
         return u;
+
     }
+
+
 }
