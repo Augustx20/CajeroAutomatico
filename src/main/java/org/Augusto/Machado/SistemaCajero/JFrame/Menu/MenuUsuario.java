@@ -10,6 +10,7 @@ import java.awt.*;
 public class MenuUsuario extends JFrame {
     Container c;
     String TEXT_SALDO = "Saldo";
+    String TEXT_TRANFERENCIAS = "Transferencia";
     String TEXT_MOVIMIENTO = "Movimiento";
     String TEXT_CONSULTAR = "Consultar";
     String TEXT_REALIZAR = "Realizar";
@@ -30,17 +31,19 @@ public class MenuUsuario extends JFrame {
         panelTop.add(titulo);
 
         // Panel para los botones
-        JPanel panelCenter = new JPanel(new GridLayout(4, 3, 10, 10)); // 4 filas, 3 columnas, espacio horizontal y vertical de 10 píxeles
+        JPanel panelCenter = new JPanel(new GridLayout(6, 3, 10, 10)); // 4 filas, 3 columnas, espacio horizontal y vertical de 10 píxeles
         JPanel panelBottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         // Añadir los botones y etiquetas
         JButton btnSaldo = new JButton(TEXT_SALDO);
+        JButton btnTranferencia = new JButton(TEXT_TRANFERENCIAS);
         JButton btnMovimiento = new JButton(TEXT_MOVIMIENTO);
         JButton btnDepositar = new JButton(TEXT_DEPOSITAR);
         JButton btnRetirar = new JButton(TEXT_RETIRAR);
-        JButton btnTransferencia = new JButton(TEXT_TRANSFERENCIA);
+        JButton btnTransferir = new JButton(TEXT_TRANSFERENCIA);
         JButton btnSalir = new JButton(TEXT_SALIR);
         JButton btnPIN = new JButton(TEXT_PIN);
+        JButton Reporte = new JButton("Generar reporte mensual");
 
 
         btnSalir.setPreferredSize(new Dimension(100, 50));
@@ -54,8 +57,10 @@ public class MenuUsuario extends JFrame {
         // Agregar botones y títulos en el orden correcto
 
         panelCenter.add(btnSaldo);
-        panelCenter.add(new JLabel());
         panelCenter.add(btnMovimiento);
+        btnMovimiento.addActionListener(e -> new MostrarMovimiento(u));
+        panelCenter.add(btnTranferencia);
+        btnTranferencia.addActionListener(e ->new MostrarTransacciones(u));
 
         panelCenter.add(new JLabel());
         panelCenter.add(new JLabel(TEXT_REALIZAR, SwingConstants.CENTER));
@@ -87,9 +92,17 @@ public class MenuUsuario extends JFrame {
 
             }
         });
-        panelCenter.add(btnTransferencia);
-        btnTransferencia.addActionListener(e -> {new Transferencia(u);});
+        panelCenter.add(btnTransferir);
+        btnTransferir.addActionListener(e ->new Transferencia(u));
         panelCenter.add(new JLabel());
+        panelCenter.add(new JLabel("Generar Reporte",SwingConstants.CENTER));
+        panelCenter.add(new JLabel());
+
+        panelCenter.add(new JLabel());
+        panelCenter.add(Reporte);
+        panelCenter.add(new JLabel());
+        panelCenter.add(new JLabel());
+
         panelCenter.add(btnPIN);
         btnPIN.addActionListener(e ->{
             String textPINNuevo = "";
@@ -115,6 +128,7 @@ public class MenuUsuario extends JFrame {
             }
         });
         panelCenter.add(btnSalir);
+
         btnSalir.addActionListener(event -> this.dispose());
 
         // Agregar los paneles al contenedor principal
@@ -128,5 +142,9 @@ public class MenuUsuario extends JFrame {
         setVisible(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    public static void main(String[] args) {
+        new MenuUsuario("test");
     }
 }

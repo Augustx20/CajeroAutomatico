@@ -15,7 +15,9 @@ public class Inicio extends JFrame {
     String TEXT_PIN = "PIN";
     JTextField INPUT_USUARIO;
     JPasswordField INPUT_PIN;
-    JButton btnLogin, btnCancel,btnCrearNuevoUsuario;
+    JButton btnLogin, btnCancel, btnCrearNuevoUsuario;
+    int intentosFallidos = 0;
+    final int MAX_INTENTOS = 3;
 
     public Inicio() {
         super("Menu Sistema Cajero Automatico");
@@ -61,42 +63,53 @@ public class Inicio extends JFrame {
         // Iniciar Sesion
         btnLogin = new JButton("Login");
         btnLogin.addActionListener(event -> {
+            // Campos A completar
+            String usuario = INPUT_USUARIO.getText();
+            char[] pin = INPUT_PIN.getPassword();
 
-                // Campos A completar
-                String usuario = INPUT_USUARIO.getText();
-                char[] pin = INPUT_PIN.getPassword();
+            UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
 
+            if (usuarioRepositorio.porUsuario(usuario, pin)) {
+                // Acciones a realizar en caso de éxito
+                JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
+                new MenuUsuario(usuario);
+            } else {
+                // Acciones a realizar en caso de error
+                intentosFallidos++;
+                JOptionPane.showMessageDialog(null, "Usuario o PIN incorrecto / Tener en cuenta que si " +
+                        "usted es usuario nuevo debe crear una cuenta nueva");
 
-                UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
-
-                if (usuarioRepositorio.porUsuario(usuario,pin)) {
-                    // Acciones a realizar en caso de éxito
-                    JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
-                    new MenuUsuario(usuario);
-                } else {
-                    // Acciones a realizar en caso de error
-                    JOptionPane.showMessageDialog(null, "Usuario o PIN incorrecto / Tener en cuenta que si " +
-                            "usted es usuario nuevo debe crear una cuenta nueva");
+                if (intentosFallidos >= MAX_INTENTOS) {
+                    JOptionPane.showMessageDialog(null,"Reiniciando Sistema aguarde unos segundos....","Error",JOptionPane.ERROR_MESSAGE);
+                    // Esperar 5 segundos antes de reiniciar
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    // Reiniciar intentos fallidos y limpiar campos de entrada
+                    intentosFallidos = 0;
+                    INPUT_USUARIO.setText("");
+                    INPUT_PIN.setText("");
                 }
+            }
         });
         pBottom.add(btnLogin);
 
-        //Cancelar Proceso
+        // Cancelar Proceso
         btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(event -> System.exit(0));
         pBottom.add(btnCancel);
 
-        //Crear Nuevo Usuario
+        // Crear Nuevo Usuario
         btnCrearNuevoUsuario = new JButton("Crear Nuevo Usuario");
         btnCrearNuevoUsuario.addActionListener(event -> new CrearNuevoUsuario());
         pBottom.add(btnCrearNuevoUsuario);
 
-
         // Configuración de la ventana
-        setSize(400,250);
+        setSize(400, 250);
         setVisible(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-
 }

@@ -53,12 +53,14 @@ public class Transferencia extends JFrame {
             if (option == JOptionPane.OK_OPTION) {
                 boolean isValid = true;
                 String errorMessage = "";
-                double value = 0.0;
+                Double value = 0.0;
+                Double saldoUsuario = 0.0;
 
                 // Validate montoField
                 try {
-                    Double saldoUsuario = usuarioRepositorio.MostrarSaldoUsuario(u);
+                    saldoUsuario = usuarioRepositorio.MostrarSaldoUsuario(u);
                     value = Double.parseDouble(montoField.getText());
+
                     if (value < 0) {
                         isValid = false;
                         errorMessage += "El monto debe ser un número positivo.\n";
@@ -85,15 +87,17 @@ public class Transferencia extends JFrame {
                 }
 
                 if (isValid) {
+                    saldoUsuario -= value;
                     usuarioRepositorio.Retirar(u, value);
-                    System.out.println("Transferencia con Éxito!!!");
+                    usuarioRepositorio.AgregarMovimiento(u,"Transferencia",value,0.0,saldoUsuario);
+                    usuarioRepositorio.AgregarTransacciones(u,usuarioField.getText(),categoriaField.getText(),value,usuarioRepositorio.porId(u));
+                    JOptionPane.showMessageDialog(null,"Transferencia con Exito","Transferencia",JOptionPane.INFORMATION_MESSAGE);
                     break;
                 } else {
                     JOptionPane.showMessageDialog(this, errorMessage, "Error de entrada", JOptionPane.ERROR_MESSAGE);
                 }
 
             } else if (option == JOptionPane.CANCEL_OPTION) {
-                System.out.println("Usted ha cancelado la transferencia");
                 break;
             }
         }

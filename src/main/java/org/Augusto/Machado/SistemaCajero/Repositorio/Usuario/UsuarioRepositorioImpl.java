@@ -259,6 +259,74 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
         } catch (SQLException e) {throw new RuntimeException(e);}
     }
 
+    @Override
+    public void AgregarTransacciones(String usuario, String destinatario, String categoria, Double saldo,int id_usuario) {
+        int u = 0;
+        try(PreparedStatement stmt = getConnection()
+                .prepareStatement(CONSULTA_SQL_ID_USUARIO)){
+            stmt.setString(1,usuario);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                u = rs.getInt("id");
+            }
+            try(PreparedStatement mov = getConnection()
+                    .prepareStatement("INSERT INTO transacciones(fecha_transaccion,usuario,destinatario,categoria,valor,id_usuario) VALUES(?,?,?,?,?,?)")){
+                mov.setDate(1,new Date(System.currentTimeMillis()));
+                mov.setString(2,usuario);
+                mov.setString(3,destinatario);
+                mov.setString(4,categoria);
+                mov.setDouble(5,saldo);
+                mov.setInt(6,id_usuario);
+                mov.executeUpdate();
+            }
+        } catch (SQLException e) {throw new RuntimeException(e);}
+    }
+
+    @Override
+    public List<Usuario> MostrarTransferencia(String usuario) {
+        List<Usuario> us = new ArrayList<>();
+        try(PreparedStatement stmt = getConnection()
+                .prepareStatement("SELECT usuario,destinatario,categoria,valor FROM transacciones WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
+            stmt.setString(1,usuario);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setUsuario(rs.getString("usuario"));
+                u.setDestinatario(rs.getString("destinatario"));
+                u.setCategoria(rs.getString("categoria"));
+                u.setSaldo(rs.getInt("valor"));
+                us.add(u);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return us;
+    }
+
+    @Override
+    public List<Usuario> MostrarMovimiento(String usuario) {
+        List<Usuario> us = new ArrayList<>();
+        try(PreparedStatement stmt = getConnection()
+                .prepareStatement("SELECT fecha,descripcion,debito,credito,saldo FROM movimientos WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
+            stmt.setString(1,usuario);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setFecha_registro(rs.getDate("fecha"));
+                u.setDescripcion(rs.getString("descripcion"));
+                u.setDebito(rs.getDouble("debito"));
+                u.setCredito(rs.getDouble("credito"));
+                u.setSaldo(rs.getInt("saldo"));
+                us.add(u);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return us;
+    }
+
 
     private static Usuario BuscarUsuario(ResultSet rs) throws SQLException {
         Usuario u = new Usuario();
@@ -270,6 +338,4 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
         return u;
 
     }
-
-
 }
