@@ -13,11 +13,13 @@ public class MostrarTransacciones extends JFrame {
 
     public MostrarTransacciones(String u) throws HeadlessException {
         super("Transacciones");
+        int mostrar = 0;
         UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
-        List<Usuario> dataList = usuarioRepositorio.MostrarTransferencia(u);
+        List<Usuario> dataList = usuarioRepositorio.MostrarTransferencia(u,mostrar);
         JTable table = new JTable(new UserTable(dataList));
 
         JScrollPane scrollPane = new JScrollPane(table);
+
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());

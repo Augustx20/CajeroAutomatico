@@ -13,8 +13,9 @@ public class MostrarMovimiento extends JFrame {
 
     public MostrarMovimiento(String u) throws HeadlessException {
         super("Movimiento");
+        int mostrar = 0;
         UsuarioRepositorio<Usuario> usuarioRepositorio = new UsuarioRepositorioImpl();
-        List<Usuario> dataList = usuarioRepositorio.MostrarMovimiento(u);
+        List<Usuario> dataList = usuarioRepositorio.MostrarMovimiento(u,mostrar);
         JTable table = new JTable(new UserTable(dataList));
 
         JScrollPane scrollPane = new JScrollPane(table);

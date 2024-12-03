@@ -29,7 +29,8 @@ public interface UsuarioRepositorio<T> {
 
     void AgregarTransacciones(String usuario,String destinatario,String categoria,Double saldo,int id_usuario);
 
-    List<T> MostrarTransferencia(String usuario);
+    List<T> MostrarTransferencia(String usuario,int mostrar);
 
-    List<T> MostrarMovimiento(String usuario);
+    List<T> MostrarMovimiento(String usuario,int mostrar);
+
 }

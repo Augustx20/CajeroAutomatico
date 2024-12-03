@@ -283,7 +283,7 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
     }
 
     @Override
-    public List<Usuario> MostrarTransferencia(String usuario) {
+    public List<Usuario> MostrarTransferencia(String usuario,int mostrar) {
         List<Usuario> us = new ArrayList<>();
         try(PreparedStatement stmt = getConnection()
                 .prepareStatement("SELECT usuario,destinatario,categoria,valor FROM transacciones WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
@@ -305,7 +305,7 @@ public class UsuarioRepositorioImpl implements UsuarioRepositorio <Usuario>{
     }
 
     @Override
-    public List<Usuario> MostrarMovimiento(String usuario) {
+    public List<Usuario> MostrarMovimiento(String usuario,int mostrar) {
         List<Usuario> us = new ArrayList<>();
         try(PreparedStatement stmt = getConnection()
                 .prepareStatement("SELECT fecha,descripcion,debito,credito,saldo FROM movimientos WHERE id_usuario = ("+CONSULTA_SQL_ID_USUARIO+")")){
